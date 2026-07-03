@@ -218,7 +218,60 @@
             min-width: 180px;
         }
 
-        /* FILTER ROW - Row 2 */
+        /* TABS ROW */
+        .tabs-row {
+            background: white;
+            border-radius: 10px;
+            padding: 6px 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            border-bottom: 3px solid #e8ecf1;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .tab-btn:hover {
+            background: #f0f2f5;
+            color: #1a3a6b;
+        }
+        .tab-btn.active {
+            color: #1a3a6b;
+            background: #e8ecf1;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #2a5298;
+        }
+        .tab-btn .badge {
+            background: #2a5298;
+            color: white;
+            border-radius: 10px;
+            padding: 1px 8px;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+        .tab-btn .badge.green {
+            background: #28a745;
+        }
+
+        /* FILTER ROW - Row 2 (only for Edit Data tab) */
         .filter-row {
             background: white;
             border-radius: 10px;
@@ -273,7 +326,7 @@
             background: #c82333;
         }
 
-        /* ACTION ROW - Row 3 */
+        /* ACTION ROW - Row 3 (only for Edit Data tab) */
         .action-row {
             background: white;
             border-radius: 10px;
@@ -291,31 +344,6 @@
             align-items: center;
             flex-wrap: wrap;
             margin-left: auto;
-        }
-        .action-row .edit-btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            background: #ff9800;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .action-row .edit-btn:hover {
-            background: #e68900;
-        }
-        .action-row .edit-btn.active {
-            background: #dc3545;
-        }
-        .action-row .edit-btn.active:hover {
-            background: #c82333;
-        }
-        .action-row .edit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
         .action-row .save-all-btn {
             padding: 8px 24px;
@@ -376,21 +404,6 @@
             color: #ff9800;
             font-weight: 700;
         }
-        .action-row .mode-indicator {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 12px;
-            white-space: nowrap;
-        }
-        .action-row .mode-indicator.view-mode {
-            background: #e8ecf1;
-            color: #666;
-        }
-        .action-row .mode-indicator.edit-mode {
-            background: #fff3cd;
-            color: #856404;
-        }
 
         /* FILTER INDICATOR */
         .filter-indicator {
@@ -403,6 +416,33 @@
         }
         .filter-indicator.show {
             display: inline-block;
+        }
+
+        /* UNIT HEADER - Updated with summary */
+        .unit-header {
+            padding: 12px 0 8px 0;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a3a6b;
+            border-bottom: 2px solid #1a3a6b;
+            margin-bottom: 16px;
+        }
+        .unit-header i {
+            margin-right: 8px;
+        }
+        .unit-header .unit-summary {
+            font-weight: 400;
+            font-size: 14px;
+            color: #555;
+            margin-left: 8px;
+        }
+        .unit-header .unit-summary .total {
+            color: #1a3a6b;
+            font-weight: 700;
+        }
+        .unit-header .unit-summary .workplace-count {
+            color: #666;
+            font-size: 13px;
         }
 
         /* WORKPLACE GROUP */
@@ -439,19 +479,6 @@
             color: #1a3a6b;
         }
 
-        /* UNIT HEADER */
-        .unit-header {
-            padding: 12px 0 8px 0;
-            font-weight: 700;
-            font-size: 18px;
-            color: #1a3a6b;
-            border-bottom: 2px solid #1a3a6b;
-            margin-bottom: 16px;
-        }
-        .unit-header i {
-            margin-right: 8px;
-        }
-
         /* TABLE */
         .table-responsive-wrapper {
             overflow-x: auto;
@@ -480,6 +507,13 @@
         .data-table tr:hover td {
             background: #f8f9fa;
         }
+        
+        /* View Mode Table (Model-A/B/C tabs) */
+        .data-table.view-table td {
+            padding: 8px 12px;
+        }
+        
+        /* Edit Mode Table */
         .data-table .editable-select {
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -487,35 +521,26 @@
             font-size: 12px;
             width: 100%;
             min-width: 140px;
-            background: #f5f5f5;
+            background: white;
             transition: border-color 0.2s, background 0.2s;
-            cursor: not-allowed;
-            color: #666;
+            cursor: pointer;
+            color: #333;
         }
         .data-table .editable-select:focus {
             outline: none;
             border-color: #2a5298;
             box-shadow: 0 0 0 2px rgba(42,82,152,0.1);
         }
-        .data-table .editable-select.enabled {
-            background: white;
-            cursor: pointer;
-            color: #333;
-        }
-        .data-table .editable-select.enabled:focus {
-            border-color: #2a5298;
-        }
         .data-table .editable-select.changed {
             border-color: #ff9800;
-            background: #fff8e1;
-        }
-        .data-table .editable-select.changed.enabled {
             background: #fff8e1;
         }
         .data-table .editable-select.model-select {
             min-width: 70px;
             text-align: center;
         }
+        
+        /* CNF Highlight */
         .data-table .name-cell {
             font-weight: 600;
             color: #1a3a6b;
@@ -584,6 +609,8 @@
             .toolbar .filter-group { flex-wrap: wrap; }
             .toolbar .filter-group select { min-width: 100%; }
             .toolbar .filter-group input { min-width: 100%; }
+            .tabs-row { justify-content: center; }
+            .tab-btn { padding: 8px 14px; font-size: 12px; }
             .filter-row { flex-direction: column; align-items: stretch; }
             .filter-row .filter-group { flex-wrap: wrap; }
             .filter-row .filter-group select { min-width: 100%; }
@@ -595,10 +622,15 @@
             .data-table .editable-select { min-width: 80px; font-size: 11px; }
             .data-table .editable-select.model-select { min-width: 50px; }
             #loginOverlay .login-box { padding: 30px 25px; margin: 15px; }
+            .unit-header { font-size: 15px; }
+            .unit-header .unit-summary { font-size: 12px; display: block; margin-left: 0; margin-top: 4px; }
         }
         @media (max-width: 480px) {
             .data-table .editable-select { min-width: 60px; font-size: 10px; }
             .data-table .editable-select.model-select { min-width: 40px; }
+            .tab-btn { padding: 6px 10px; font-size: 11px; }
+            .unit-header { font-size: 14px; }
+            .unit-header .unit-summary .workplace-count { font-size: 11px; }
         }
     </style>
 </head>
@@ -667,8 +699,24 @@
         </div>
     </div>
 
-    <!-- FILTER ROW - Row 2: Additional Filters -->
-    <div class="filter-row" id="filterRow">
+    <!-- TABS ROW -->
+    <div class="tabs-row" id="tabsRow">
+        <button class="tab-btn active" data-tab="modelA" onclick="switchTab('modelA')">
+            <i class="fa fa-cubes"></i> Model-A <span class="badge green" id="modelABadge">0</span>
+        </button>
+        <button class="tab-btn" data-tab="modelB" onclick="switchTab('modelB')">
+            <i class="fa fa-cubes"></i> Model-B <span class="badge green" id="modelBBadge">0</span>
+        </button>
+        <button class="tab-btn" data-tab="modelC" onclick="switchTab('modelC')">
+            <i class="fa fa-cubes"></i> Model-C <span class="badge green" id="modelCBadge">0</span>
+        </button>
+        <button class="tab-btn" data-tab="edit" onclick="switchTab('edit')">
+            ✏️ Edit Data
+        </button>
+    </div>
+
+    <!-- FILTER ROW - Row 2: Additional Filters (only for Edit Data tab) -->
+    <div class="filter-row" id="filterRow" style="display:none;">
         <div class="filter-group">
             <label>CNF:</label>
             <select id="filterType" onchange="applyFilters()">
@@ -684,6 +732,8 @@
                 <option value="NP-Design">NP-Design</option>
                 <option value="Versatile">Versatile</option>
                 <option value="PDF/QC">PDF/QC</option>
+                <option value="Notice/Display Advt">Notice/Display Advt</option>
+                <option value="Event/Creative Advt">Event/Creative Advt</option>
             </select>
         </div>
         <div class="filter-group">
@@ -716,13 +766,9 @@
         <span class="filter-indicator" id="filterIndicator"></span>
     </div>
 
-    <!-- ACTION ROW - Row 3: Edit/Save/Refresh -->
-    <div class="action-row" id="actionRow">
-        <span class="mode-indicator view-mode" id="modeIndicator">👁️ View Mode</span>
+    <!-- ACTION ROW - Row 3: Save/Refresh (only for Edit Data tab) -->
+    <div class="action-row" id="actionRow" style="display:none;">
         <div class="action-group">
-            <button class="edit-btn" id="editBtn" onclick="toggleEditMode()">
-                <i class="fa fa-pencil"></i> Edit Data
-            </button>
             <button class="save-all-btn" id="saveBtn" onclick="saveAllChanges()" disabled>
                 <i class="fa fa-save"></i> Save All Changes
             </button>
@@ -775,7 +821,7 @@ let selectedUnit = 'all';
 let selectedWorkplace = 'all';
 let searchQuery = '';
 let isAdmin = false;
-let isEditMode = false;
+let currentTab = 'modelA';
 
 // ============================================================
 // HELPER FUNCTIONS
@@ -809,61 +855,20 @@ function escapeHtml(str) {
 }
 
 // ============================================================
-// EDIT MODE TOGGLE
+// TAB SWITCHING
 // ============================================================
-function toggleEditMode() {
-    isEditMode = !isEditMode;
+function switchTab(tab) {
+    currentTab = tab;
     
-    const editBtn = document.getElementById('editBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const modeIndicator = document.getElementById('modeIndicator');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
     
-    if (isEditMode) {
-        editBtn.innerHTML = '<i class="fa fa-times"></i> Cancel Edit';
-        editBtn.classList.add('active');
-        modeIndicator.className = 'mode-indicator edit-mode';
-        modeIndicator.textContent = '✏️ Edit Mode';
-        saveBtn.disabled = true;
-        
-        document.querySelectorAll('.editable-select').forEach(sel => {
-            sel.disabled = false;
-            sel.classList.add('enabled');
-        });
-        
-        // Disable filters in edit mode
-        document.getElementById('filterType').disabled = true;
-        document.getElementById('filterExpertise').disabled = true;
-        document.getElementById('filterModelA').disabled = true;
-        document.getElementById('filterModelB').disabled = true;
-        document.getElementById('filterModelC').disabled = true;
-        
-        showToast('Edit mode enabled - make your changes', 'info');
-    } else {
-        // Cancel edit - discard changes
-        employeeChanges = {};
-        editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
-        editBtn.classList.remove('active');
-        modeIndicator.className = 'mode-indicator view-mode';
-        modeIndicator.textContent = '👁️ View Mode';
-        saveBtn.disabled = true;
-        
-        document.querySelectorAll('.editable-select').forEach(sel => {
-            sel.disabled = true;
-            sel.classList.remove('enabled');
-            sel.classList.remove('changed');
-        });
-        
-        // Enable filters
-        document.getElementById('filterType').disabled = false;
-        document.getElementById('filterExpertise').disabled = false;
-        document.getElementById('filterModelA').disabled = false;
-        document.getElementById('filterModelB').disabled = false;
-        document.getElementById('filterModelC').disabled = false;
-        
-        refreshData();
-        updateChangeStatus();
-        showToast('Edit cancelled - changes discarded', 'info');
-    }
+    const isEdit = tab === 'edit';
+    document.getElementById('filterRow').style.display = isEdit ? 'flex' : 'none';
+    document.getElementById('actionRow').style.display = isEdit ? 'flex' : 'none';
+    
+    applyFilters();
 }
 
 // ============================================================
@@ -923,8 +928,7 @@ async function handleLogin() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         document.getElementById('headerUserName').textContent = loggedInUser.name || loggedInUser.email || 'User';
-        document.getElementById('headerUserRole').textContent = (loggedInUser.role || '') + 
-            (loggedInUser.role === 'ICD Head' && loggedInUser.units.length > 0 ? ' - ' + loggedInUser.units.join(', ') : '');
+        document.getElementById('headerUserRole').textContent = loggedInUser.role || '';
         
         await loadEmployees();
         
@@ -943,7 +947,6 @@ function logout() {
         allEmployees = [];
         filteredEmployees = [];
         employeeChanges = {};
-        isEditMode = false;
         document.getElementById('mainContent').style.display = 'none';
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('loginEmail').value = '';
@@ -992,8 +995,7 @@ auth.onAuthStateChanged(async (user) => {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         document.getElementById('headerUserName').textContent = loggedInUser.name || loggedInUser.email || 'User';
-        document.getElementById('headerUserRole').textContent = (loggedInUser.role || '') + 
-            (loggedInUser.role === 'ICD Head' && loggedInUser.units.length > 0 ? ' - ' + loggedInUser.units.join(', ') : '');
+        document.getElementById('headerUserRole').textContent = loggedInUser.role || '';
         
         await loadEmployees();
     }
@@ -1021,20 +1023,22 @@ async function loadEmployees() {
         `;
         
         const usersSnapshot = await db.collection('users').get();
-        allEmployees = [];
+        let allUsers = [];
         usersSnapshot.forEach(doc => {
             const data = doc.data();
-            allEmployees.push({
+            allUsers.push({
                 id: doc.id,
                 documentId: doc.id,
                 ...data
             });
         });
         
-        let filteredAll = allEmployees;
+        // Filter out Admin users from employee data
+        let filteredAll = allUsers.filter(emp => emp.role !== 'Admin');
+        
         if (!isAdmin) {
             const units = loggedInUser.units || [];
-            filteredAll = allEmployees.filter(emp => {
+            filteredAll = filteredAll.filter(emp => {
                 const empUnit = emp.unit || '';
                 return units.some(u => empUnit.toLowerCase() === u.toLowerCase());
             });
@@ -1042,9 +1046,10 @@ async function loadEmployees() {
         
         allEmployees = filteredAll;
         
-        // Populate unit dropdown with "All Units"
         populateUnitDropdown();
         updateWorkplaceDropdown();
+        updateBadges();
+        
         applyFilters();
         showToast('Data loaded from Firestore!', 'success');
         
@@ -1058,6 +1063,20 @@ async function loadEmployees() {
         `;
         showToast('Error loading data: ' + error.message, 'error');
     }
+}
+
+// ============================================================
+// UPDATE BADGES
+// ============================================================
+function updateBadges() {
+    const nonAdminEmployees = allEmployees.filter(emp => emp.role !== 'Admin');
+    const modelAcount = nonAdminEmployees.filter(emp => emp.modelA === true).length;
+    const modelBcount = nonAdminEmployees.filter(emp => emp.modelB === true).length;
+    const modelCcount = nonAdminEmployees.filter(emp => emp.modelC === true).length;
+    
+    document.getElementById('modelABadge').textContent = modelAcount;
+    document.getElementById('modelBBadge').textContent = modelBcount;
+    document.getElementById('modelCBadge').textContent = modelCcount;
 }
 
 // ============================================================
@@ -1075,13 +1094,11 @@ function populateUnitDropdown() {
     
     unitSelect.innerHTML = '';
     
-    // Add "All Units" option first
     const allOption = document.createElement('option');
     allOption.value = 'all';
     allOption.textContent = 'All Units';
     unitSelect.appendChild(allOption);
     
-    // Add individual units
     units.sort().forEach(unit => {
         const option = document.createElement('option');
         option.value = unit;
@@ -1110,13 +1127,11 @@ function updateWorkplaceDropdown() {
     
     workplaceSelect.innerHTML = '';
     
-    // Add "All Workplaces" option first
     const allOption = document.createElement('option');
     allOption.value = 'all';
     allOption.textContent = 'All Workplaces';
     workplaceSelect.appendChild(allOption);
     
-    // Add individual workplaces
     workplaces.sort().forEach(w => {
         const option = document.createElement('option');
         option.value = w;
@@ -1133,21 +1148,6 @@ function updateWorkplaceDropdown() {
 // ============================================================
 async function refreshData() {
     employeeChanges = {};
-    if (isEditMode) {
-        isEditMode = false;
-        const editBtn = document.getElementById('editBtn');
-        const modeIndicator = document.getElementById('modeIndicator');
-        editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
-        editBtn.classList.remove('active');
-        modeIndicator.className = 'mode-indicator view-mode';
-        modeIndicator.textContent = '👁️ View Mode';
-        
-        document.getElementById('filterType').disabled = false;
-        document.getElementById('filterExpertise').disabled = false;
-        document.getElementById('filterModelA').disabled = false;
-        document.getElementById('filterModelB').disabled = false;
-        document.getElementById('filterModelC').disabled = false;
-    }
     await loadEmployees();
     showToast('Data refreshed from Firestore!', 'info');
 }
@@ -1170,7 +1170,6 @@ function applyFilters() {
     selectedWorkplace = document.getElementById('workplaceSelect').value;
     searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
     
-    // Get filter values
     const filterType = document.getElementById('filterType').value;
     const filterExpertise = document.getElementById('filterExpertise').value;
     const filterModelA = document.getElementById('filterModelA').value;
@@ -1190,39 +1189,39 @@ function applyFilters() {
         filtered = filtered.filter(emp => (emp.workplace || '') === selectedWorkplace);
     }
     
-    // STEP 3: Filter by Type (CNF)
-    if (filterType !== 'all') {
-        filtered = filtered.filter(emp => (emp.type || '').toUpperCase() === filterType.toUpperCase());
-    }
-    
-    // STEP 4: Filter by Expertise
-    if (filterExpertise !== 'all') {
-        filtered = filtered.filter(emp => (emp.expertise || '') === filterExpertise);
-    }
-    
-    // STEP 5: Filter by Model-A
-    if (filterModelA !== 'all') {
-        const isYes = filterModelA === 'yes';
-        filtered = filtered.filter(emp => emp.modelA === isYes);
-    }
-    
-    // STEP 6: Filter by Model-B
-    if (filterModelB !== 'all') {
-        const isYes = filterModelB === 'yes';
-        filtered = filtered.filter(emp => emp.modelB === isYes);
-    }
-    
-    // STEP 7: Filter by Model-C
-    if (filterModelC !== 'all') {
-        const isYes = filterModelC === 'yes';
-        filtered = filtered.filter(emp => emp.modelC === isYes);
-    }
-    
-    // STEP 8: Search by name
+    // STEP 3: Search by name
     if (searchQuery) {
         filtered = filtered.filter(emp => 
             (emp.name || '').toLowerCase().includes(searchQuery)
         );
+    }
+    
+    // STEP 4: Apply tab-specific filters
+    if (currentTab === 'modelA') {
+        filtered = filtered.filter(emp => emp.modelA === true);
+    } else if (currentTab === 'modelB') {
+        filtered = filtered.filter(emp => emp.modelB === true);
+    } else if (currentTab === 'modelC') {
+        filtered = filtered.filter(emp => emp.modelC === true);
+    } else if (currentTab === 'edit') {
+        if (filterType !== 'all') {
+            filtered = filtered.filter(emp => (emp.type || '').toUpperCase() === filterType.toUpperCase());
+        }
+        if (filterExpertise !== 'all') {
+            filtered = filtered.filter(emp => (emp.expertise || '') === filterExpertise);
+        }
+        if (filterModelA !== 'all') {
+            const isYes = filterModelA === 'yes';
+            filtered = filtered.filter(emp => emp.modelA === isYes);
+        }
+        if (filterModelB !== 'all') {
+            const isYes = filterModelB === 'yes';
+            filtered = filtered.filter(emp => emp.modelB === isYes);
+        }
+        if (filterModelC !== 'all') {
+            const isYes = filterModelC === 'yes';
+            filtered = filtered.filter(emp => emp.modelC === isYes);
+        }
     }
     
     filteredEmployees = filtered;
@@ -1234,6 +1233,11 @@ function applyFilters() {
 // UPDATE FILTER INDICATOR
 // ============================================================
 function updateFilterIndicator() {
+    if (currentTab !== 'edit') {
+        document.getElementById('filterIndicator').className = 'filter-indicator';
+        return;
+    }
+    
     const filterType = document.getElementById('filterType').value;
     const filterExpertise = document.getElementById('filterExpertise').value;
     const filterModelA = document.getElementById('filterModelA').value;
@@ -1274,16 +1278,22 @@ function clearFilters() {
 }
 
 // ============================================================
-// RENDER CONTENT - GROUPED BY UNIT THEN WORKPLACE
+// RENDER CONTENT
 // ============================================================
 function renderContent() {
     const container = document.getElementById('contentArea');
+    const isEditTab = currentTab === 'edit';
     
     if (!filteredEmployees || filteredEmployees.length === 0) {
+        let message = 'No employees found';
+        if (currentTab === 'modelA') message = 'No employees with Model-A = Yes';
+        else if (currentTab === 'modelB') message = 'No employees with Model-B = Yes';
+        else if (currentTab === 'modelC') message = 'No employees with Model-C = Yes';
+        
         container.innerHTML = `
             <div class="no-data">
                 <i class="fa fa-users"></i>
-                No employees found for the selected filters.
+                ${message} for the selected filters.
             </div>
         `;
         updateChangeStatus();
@@ -1301,6 +1311,9 @@ function renderContent() {
     const units = Object.keys(unitMap).sort();
     let html = '';
     
+    // Determine which columns to show
+    const showModelColumns = isEditTab;
+    
     units.forEach(unit => {
         const unitEmployees = unitMap[unit];
         
@@ -1314,14 +1327,24 @@ function renderContent() {
         
         const workplaces = Object.keys(workplaceMap).sort();
         
-        // Show unit header if multiple units are shown
-        if (units.length > 1) {
-            html += `
-                <div class="unit-header">
-                    <i class="fa fa-building"></i> ${escapeHtml(unit)}
-                </div>
-            `;
-        }
+        // Calculate total employees in this unit
+        let totalEmployees = 0;
+        const workplaceSummary = workplaces.map(workplace => {
+            const count = workplaceMap[workplace].length;
+            totalEmployees += count;
+            return `${workplace}-${count}`;
+        }).join(', ');
+        
+        // Build unit header with summary
+        html += `
+            <div class="unit-header">
+                <i class="fa fa-building"></i> ${escapeHtml(unit)}
+                <span class="unit-summary">
+                    - <span class="total">${totalEmployees}</span>
+                    <span class="workplace-count">(${escapeHtml(workplaceSummary)})</span>
+                </span>
+            </div>
+        `;
         
         workplaces.forEach(workplace => {
             const employees = workplaceMap[workplace];
@@ -1339,7 +1362,7 @@ function renderContent() {
                         </span>
                     </div>
                     <div class="table-responsive-wrapper">
-                        <table class="data-table" id="table_${escapeHtml(unit)}_${escapeHtml(workplace)}">
+                        <table class="data-table ${isEditTab ? '' : 'view-table'}">
                             <thead>
                                 <tr>
                                     <th style="min-width:120px;">Name</th>
@@ -1347,9 +1370,11 @@ function renderContent() {
                                     <th style="min-width:120px;">Designation</th>
                                     <th style="min-width:80px;">Type</th>
                                     <th style="min-width:160px;">Expertise</th>
+                                    ${showModelColumns ? `
                                     <th style="min-width:80px;text-align:center;">Model-A</th>
                                     <th style="min-width:80px;text-align:center;">Model-B</th>
                                     <th style="min-width:80px;text-align:center;">Model-C</th>
+                                    ` : ''}
                                 </tr>
                             </thead>
                             <tbody>
@@ -1367,69 +1392,69 @@ function renderContent() {
                 const isCNF = emp.type && emp.type.toUpperCase() === 'CNF';
                 const cnfClass = isCNF ? 'text-cnf' : '';
                 
-                const expertiseOptions = ['', 'Creative/Feature', 'NP-Design', 'Versatile', 'PDF/QC'];
-                const expertiseSelect = expertiseOptions.map(opt => 
-                    `<option value="${opt}" ${expertise === opt ? 'selected' : ''}>${opt || '—'}</option>`
-                ).join('');
+                html += `<tr id="${rowId}" data-docid="${escapeHtml(docId)}" data-workplace="${escapeHtml(workplace)}" data-unit="${escapeHtml(unit)}">`;
                 
-                const modelOptions = ['', 'Yes', 'No'];
-                const modelASelect = modelOptions.map(opt => 
-                    `<option value="${opt}" ${modelA === opt ? 'selected' : ''}>${opt || '—'}</option>`
-                ).join('');
-                const modelBSelect = modelOptions.map(opt => 
-                    `<option value="${opt}" ${modelB === opt ? 'selected' : ''}>${opt || '—'}</option>`
-                ).join('');
-                const modelCSelect = modelOptions.map(opt => 
-                    `<option value="${opt}" ${modelC === opt ? 'selected' : ''}>${opt || '—'}</option>`
-                ).join('');
+                html += `<td class="name-cell ${cnfClass}">${escapeHtml(emp.name || '')}</td>`;
+                html += `<td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>`;
+                html += `<td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>`;
+                html += `<td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>`;
                 
-                const disabledAttr = isEditMode ? '' : 'disabled';
-                const enabledClass = isEditMode ? 'enabled' : '';
-                
-                html += `
-                    <tr id="${rowId}" data-docid="${escapeHtml(docId)}" data-workplace="${escapeHtml(workplace)}" data-unit="${escapeHtml(unit)}">
-                        <td class="name-cell ${cnfClass}">${escapeHtml(emp.name || '')}</td>
-                        <td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>
-                        <td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>
-                        <td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>
+                if (isEditTab) {
+                    const expertiseOptions = ['', 'Creative/Feature', 'NP-Design', 'Versatile', 'PDF/QC', 'Notice/Display Advt', 'Event/Creative Advt'];
+                    const expertiseSelect = expertiseOptions.map(opt => 
+                        `<option value="${opt}" ${expertise === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                    ).join('');
+                    
+                    const modelOptions = ['', 'Yes', 'No'];
+                    const modelASelect = modelOptions.map(opt => 
+                        `<option value="${opt}" ${modelA === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                    ).join('');
+                    const modelBSelect = modelOptions.map(opt => 
+                        `<option value="${opt}" ${modelB === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                    ).join('');
+                    const modelCSelect = modelOptions.map(opt => 
+                        `<option value="${opt}" ${modelC === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                    ).join('');
+                    
+                    html += `
                         <td>
-                            <select class="editable-select ${enabledClass}" 
+                            <select class="editable-select" 
                                     data-row="${rowId}" 
                                     data-field="expertise"
-                                    onchange="onFieldChange('${rowId}', 'expertise', this.value)"
-                                    ${disabledAttr}>
+                                    onchange="onFieldChange('${rowId}', 'expertise', this.value)">
                                 ${expertiseSelect}
                             </select>
                         </td>
                         <td style="text-align:center;">
-                            <select class="editable-select model-select ${enabledClass}" 
+                            <select class="editable-select model-select" 
                                     data-row="${rowId}" 
                                     data-field="modelA"
-                                    onchange="onFieldChange('${rowId}', 'modelA', this.value)"
-                                    ${disabledAttr}>
+                                    onchange="onFieldChange('${rowId}', 'modelA', this.value)">
                                 ${modelASelect}
                             </select>
                         </td>
                         <td style="text-align:center;">
-                            <select class="editable-select model-select ${enabledClass}" 
+                            <select class="editable-select model-select" 
                                     data-row="${rowId}" 
                                     data-field="modelB"
-                                    onchange="onFieldChange('${rowId}', 'modelB', this.value)"
-                                    ${disabledAttr}>
+                                    onchange="onFieldChange('${rowId}', 'modelB', this.value)">
                                 ${modelBSelect}
                             </select>
                         </td>
                         <td style="text-align:center;">
-                            <select class="editable-select model-select ${enabledClass}" 
+                            <select class="editable-select model-select" 
                                     data-row="${rowId}" 
                                     data-field="modelC"
-                                    onchange="onFieldChange('${rowId}', 'modelC', this.value)"
-                                    ${disabledAttr}>
+                                    onchange="onFieldChange('${rowId}', 'modelC', this.value)">
                                 ${modelCSelect}
                             </select>
                         </td>
-                    </tr>
-                `;
+                    `;
+                } else {
+                    html += `<td>${escapeHtml(expertise || '—')}</td>`;
+                }
+                
+                html += `</tr>`;
             });
             
             html += `
@@ -1449,7 +1474,7 @@ function renderContent() {
 // FIELD CHANGE HANDLER
 // ============================================================
 function onFieldChange(rowId, field, value) {
-    if (!isEditMode) return;
+    if (currentTab !== 'edit') return;
     
     if (!employeeChanges[rowId]) {
         employeeChanges[rowId] = {};
@@ -1488,7 +1513,7 @@ function updateChangeStatus() {
     }
     
     if (saveBtn) {
-        saveBtn.disabled = !(isEditMode && totalChanges > 0);
+        saveBtn.disabled = !(totalChanges > 0);
     }
 }
 
@@ -1496,8 +1521,8 @@ function updateChangeStatus() {
 // SAVE ALL CHANGES TO FIRESTORE
 // ============================================================
 async function saveAllChanges() {
-    if (!isEditMode) {
-        showToast('Please enter Edit Mode first', 'info');
+    if (currentTab !== 'edit') {
+        showToast('Please go to Edit Data tab to save changes', 'info');
         return;
     }
     
@@ -1553,7 +1578,6 @@ async function saveAllChanges() {
         
         await batch.commit();
         
-        // Update local data
         updates.forEach(update => {
             const emp = allEmployees.find(e => (e.documentId || e.id) === update.docId);
             if (emp) {
@@ -1579,28 +1603,7 @@ async function saveAllChanges() {
             statusEl.className = 'save-status';
         }, 3000);
         
-        // Exit edit mode after successful save
-        if (isEditMode) {
-            isEditMode = false;
-            const editBtn = document.getElementById('editBtn');
-            const modeIndicator = document.getElementById('modeIndicator');
-            editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
-            editBtn.classList.remove('active');
-            modeIndicator.className = 'mode-indicator view-mode';
-            modeIndicator.textContent = '👁️ View Mode';
-            
-            document.querySelectorAll('.editable-select').forEach(sel => {
-                sel.disabled = true;
-                sel.classList.remove('enabled');
-            });
-            
-            document.getElementById('filterType').disabled = false;
-            document.getElementById('filterExpertise').disabled = false;
-            document.getElementById('filterModelA').disabled = false;
-            document.getElementById('filterModelB').disabled = false;
-            document.getElementById('filterModelC').disabled = false;
-        }
-        
+        updateBadges();
         applyFilters();
         
     } catch(error) {
