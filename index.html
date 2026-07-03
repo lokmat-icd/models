@@ -418,8 +418,8 @@
             display: inline-block;
         }
 
-        /* UNIT HEADER - Updated with summary */
-        .unit-header {
+        /* UNIT HEADER - View Mode (Model-A/B/C tabs) */
+        .unit-header-view {
             padding: 12px 0 8px 0;
             font-weight: 700;
             font-size: 18px;
@@ -427,25 +427,34 @@
             border-bottom: 2px solid #1a3a6b;
             margin-bottom: 16px;
         }
-        .unit-header i {
+        .unit-header-view i {
             margin-right: 8px;
         }
-        .unit-header .unit-summary {
+        .unit-header-view .total-count {
             font-weight: 400;
             font-size: 14px;
             color: #555;
             margin-left: 8px;
         }
-        .unit-header .unit-summary .total {
+        .unit-header-view .total-count .num {
             color: #1a3a6b;
             font-weight: 700;
         }
-        .unit-header .unit-summary .workplace-count {
-            color: #666;
-            font-size: 13px;
+
+        /* UNIT HEADER - Edit Mode (no change) */
+        .unit-header-edit {
+            padding: 12px 0 8px 0;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a3a6b;
+            border-bottom: 2px solid #1a3a6b;
+            margin-bottom: 16px;
+        }
+        .unit-header-edit i {
+            margin-right: 8px;
         }
 
-        /* WORKPLACE GROUP */
+        /* WORKPLACE GROUP (only for Edit Data tab) */
         .workplace-group {
             margin-bottom: 24px;
             border: 1px solid #e8ecf1;
@@ -479,16 +488,13 @@
             color: #1a3a6b;
         }
 
-        /* TABLE */
-        .table-responsive-wrapper {
-            overflow-x: auto;
-        }
-        .data-table {
+        /* TABLE - View Mode (Model-A/B/C tabs) */
+        .data-table.view-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
         }
-        .data-table th {
+        .data-table.view-table th {
             background: #2a5298;
             color: white;
             padding: 8px 12px;
@@ -496,25 +502,48 @@
             font-weight: 600;
             white-space: nowrap;
         }
-        .data-table td {
+        .data-table.view-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e8ecf1;
+            vertical-align: middle;
+        }
+        .data-table.view-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table.view-table tr:hover td {
+            background: #f8f9fa;
+        }
+        .data-table.view-table .text-cnf {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
+        /* TABLE - Edit Mode */
+        .data-table.edit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .data-table.edit-table th {
+            background: #2a5298;
+            color: white;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .data-table.edit-table td {
             padding: 6px 12px;
             border-bottom: 1px solid #e8ecf1;
             vertical-align: middle;
         }
-        .data-table tr:last-child td {
+        .data-table.edit-table tr:last-child td {
             border-bottom: none;
         }
-        .data-table tr:hover td {
+        .data-table.edit-table tr:hover td {
             background: #f8f9fa;
         }
-        
-        /* View Mode Table (Model-A/B/C tabs) */
-        .data-table.view-table td {
-            padding: 8px 12px;
-        }
-        
-        /* Edit Mode Table */
-        .data-table .editable-select {
+        .data-table.edit-table .editable-select {
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 4px 8px;
@@ -526,26 +555,20 @@
             cursor: pointer;
             color: #333;
         }
-        .data-table .editable-select:focus {
+        .data-table.edit-table .editable-select:focus {
             outline: none;
             border-color: #2a5298;
             box-shadow: 0 0 0 2px rgba(42,82,152,0.1);
         }
-        .data-table .editable-select.changed {
+        .data-table.edit-table .editable-select.changed {
             border-color: #ff9800;
             background: #fff8e1;
         }
-        .data-table .editable-select.model-select {
+        .data-table.edit-table .editable-select.model-select {
             min-width: 70px;
             text-align: center;
         }
-        
-        /* CNF Highlight */
-        .data-table .name-cell {
-            font-weight: 600;
-            color: #1a3a6b;
-        }
-        .data-table .text-cnf {
+        .data-table.edit-table .text-cnf {
             color: #dc3545 !important;
             font-weight: 600;
         }
@@ -617,20 +640,22 @@
             .filter-row .clear-filters-btn { margin-left: 0; }
             .action-row { flex-direction: column; align-items: stretch; }
             .action-row .action-group { margin-left: 0; justify-content: center; }
-            .data-table { font-size: 11px; }
-            .data-table th, .data-table td { padding: 5px 8px; }
-            .data-table .editable-select { min-width: 80px; font-size: 11px; }
-            .data-table .editable-select.model-select { min-width: 50px; }
+            .data-table.view-table { font-size: 11px; }
+            .data-table.edit-table { font-size: 11px; }
+            .data-table.view-table th, .data-table.view-table td { padding: 5px 8px; }
+            .data-table.edit-table th, .data-table.edit-table td { padding: 5px 8px; }
+            .data-table.edit-table .editable-select { min-width: 80px; font-size: 11px; }
+            .data-table.edit-table .editable-select.model-select { min-width: 50px; }
             #loginOverlay .login-box { padding: 30px 25px; margin: 15px; }
-            .unit-header { font-size: 15px; }
-            .unit-header .unit-summary { font-size: 12px; display: block; margin-left: 0; margin-top: 4px; }
+            .unit-header-view { font-size: 15px; }
+            .unit-header-edit { font-size: 15px; }
         }
         @media (max-width: 480px) {
-            .data-table .editable-select { min-width: 60px; font-size: 10px; }
-            .data-table .editable-select.model-select { min-width: 40px; }
+            .data-table.edit-table .editable-select { min-width: 60px; font-size: 10px; }
+            .data-table.edit-table .editable-select.model-select { min-width: 40px; }
             .tab-btn { padding: 6px 10px; font-size: 11px; }
-            .unit-header { font-size: 14px; }
-            .unit-header .unit-summary .workplace-count { font-size: 11px; }
+            .unit-header-view { font-size: 14px; }
+            .unit-header-edit { font-size: 14px; }
         }
     </style>
 </head>
@@ -1300,7 +1325,7 @@ function renderContent() {
         return;
     }
     
-    // Group by unit first, then by workplace
+    // Group by unit
     const unitMap = {};
     filteredEmployees.forEach(emp => {
         const unit = emp.unit || 'Unknown';
@@ -1311,160 +1336,191 @@ function renderContent() {
     const units = Object.keys(unitMap).sort();
     let html = '';
     
-    // Determine which columns to show
-    const showModelColumns = isEditTab;
-    
-    units.forEach(unit => {
-        const unitEmployees = unitMap[unit];
-        
-        // Group by workplace within each unit
-        const workplaceMap = {};
-        unitEmployees.forEach(emp => {
-            const workplace = emp.workplace || 'Unknown';
-            if (!workplaceMap[workplace]) workplaceMap[workplace] = [];
-            workplaceMap[workplace].push(emp);
-        });
-        
-        const workplaces = Object.keys(workplaceMap).sort();
-        
-        // Calculate total employees in this unit
-        let totalEmployees = 0;
-        const workplaceSummary = workplaces.map(workplace => {
-            const count = workplaceMap[workplace].length;
-            totalEmployees += count;
-            return `${workplace}-${count}`;
-        }).join(', ');
-        
-        // Build unit header with summary
-        html += `
-            <div class="unit-header">
-                <i class="fa fa-building"></i> ${escapeHtml(unit)}
-                <span class="unit-summary">
-                    - <span class="total">${totalEmployees}</span>
-                    <span class="workplace-count">(${escapeHtml(workplaceSummary)})</span>
-                </span>
-            </div>
-        `;
-        
-        workplaces.forEach(workplace => {
-            const employees = workplaceMap[workplace];
-            const employeeCount = employees.length;
+    if (isEditTab) {
+        // ============================================================
+        // EDIT DATA TAB - Grouped by Workplace (No Change)
+        // ============================================================
+        units.forEach(unit => {
+            const unitEmployees = unitMap[unit];
+            
+            // Group by workplace within each unit
+            const workplaceMap = {};
+            unitEmployees.forEach(emp => {
+                const workplace = emp.workplace || 'Unknown';
+                if (!workplaceMap[workplace]) workplaceMap[workplace] = [];
+                workplaceMap[workplace].push(emp);
+            });
+            
+            const workplaces = Object.keys(workplaceMap).sort();
             
             html += `
-                <div class="workplace-group">
-                    <div class="workplace-header">
-                        <span class="workplace-name">
-                            <i class="fa fa-location-arrow"></i>
-                            ${escapeHtml(workplace)}
-                        </span>
-                        <span class="employee-count">
-                            Employees: <span class="num">${employeeCount}</span>
-                        </span>
-                    </div>
-                    <div class="table-responsive-wrapper">
-                        <table class="data-table ${isEditTab ? '' : 'view-table'}">
-                            <thead>
-                                <tr>
-                                    <th style="min-width:120px;">Name</th>
-                                    <th style="min-width:80px;">Role</th>
-                                    <th style="min-width:120px;">Designation</th>
-                                    <th style="min-width:80px;">Type</th>
-                                    <th style="min-width:160px;">Expertise</th>
-                                    ${showModelColumns ? `
-                                    <th style="min-width:80px;text-align:center;">Model-A</th>
-                                    <th style="min-width:80px;text-align:center;">Model-B</th>
-                                    <th style="min-width:80px;text-align:center;">Model-C</th>
-                                    ` : ''}
-                                </tr>
-                            </thead>
-                            <tbody>
+                <div class="unit-header-edit">
+                    <i class="fa fa-building"></i> ${escapeHtml(unit)}
+                </div>
             `;
             
-            employees.forEach((emp, index) => {
-                const rowId = 'row_' + unit.replace(/[^a-zA-Z0-9]/g, '_') + '_' + workplace.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
-                const docId = emp.documentId || emp.id || '';
+            workplaces.forEach(workplace => {
+                const employees = workplaceMap[workplace];
+                const employeeCount = employees.length;
                 
-                const expertise = emp.expertise || '';
-                const modelA = emp.modelA !== undefined ? (emp.modelA ? 'Yes' : 'No') : '';
-                const modelB = emp.modelB !== undefined ? (emp.modelB ? 'Yes' : 'No') : '';
-                const modelC = emp.modelC !== undefined ? (emp.modelC ? 'Yes' : 'No') : '';
+                html += `
+                    <div class="workplace-group">
+                        <div class="workplace-header">
+                            <span class="workplace-name">
+                                <i class="fa fa-location-arrow"></i>
+                                ${escapeHtml(workplace)}
+                            </span>
+                            <span class="employee-count">
+                                Employees: <span class="num">${employeeCount}</span>
+                            </span>
+                        </div>
+                        <div class="table-responsive-wrapper">
+                            <table class="data-table edit-table">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:120px;">Name</th>
+                                        <th style="min-width:80px;">Role</th>
+                                        <th style="min-width:120px;">Designation</th>
+                                        <th style="min-width:80px;">Type</th>
+                                        <th style="min-width:160px;">Expertise</th>
+                                        <th style="min-width:80px;text-align:center;">Model-A</th>
+                                        <th style="min-width:80px;text-align:center;">Model-B</th>
+                                        <th style="min-width:80px;text-align:center;">Model-C</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
                 
-                const isCNF = emp.type && emp.type.toUpperCase() === 'CNF';
-                const cnfClass = isCNF ? 'text-cnf' : '';
-                
-                html += `<tr id="${rowId}" data-docid="${escapeHtml(docId)}" data-workplace="${escapeHtml(workplace)}" data-unit="${escapeHtml(unit)}">`;
-                
-                html += `<td class="name-cell ${cnfClass}">${escapeHtml(emp.name || '')}</td>`;
-                html += `<td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>`;
-                html += `<td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>`;
-                html += `<td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>`;
-                
-                if (isEditTab) {
+                employees.forEach((emp, index) => {
+                    const rowId = 'row_' + unit.replace(/[^a-zA-Z0-9]/g, '_') + '_' + workplace.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
+                    const docId = emp.documentId || emp.id || '';
+                    
+                    const expertise = emp.expertise || '';
+                    const modelA = emp.modelA !== undefined ? (emp.modelA ? 'Yes' : 'No') : 'No';
+                    const modelB = emp.modelB !== undefined ? (emp.modelB ? 'Yes' : 'No') : 'No';
+                    const modelC = emp.modelC !== undefined ? (emp.modelC ? 'Yes' : 'No') : 'No';
+                    
+                    const isCNF = emp.type && emp.type.toUpperCase() === 'CNF';
+                    const cnfClass = isCNF ? 'text-cnf' : '';
+                    
                     const expertiseOptions = ['', 'Creative/Feature', 'NP-Design', 'Versatile', 'PDF/QC', 'Notice/Display Advt', 'Event/Creative Advt'];
                     const expertiseSelect = expertiseOptions.map(opt => 
                         `<option value="${opt}" ${expertise === opt ? 'selected' : ''}>${opt || '—'}</option>`
                     ).join('');
                     
-                    const modelOptions = ['', 'Yes', 'No'];
+                    const modelOptions = ['Yes', 'No'];
                     const modelASelect = modelOptions.map(opt => 
-                        `<option value="${opt}" ${modelA === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                        `<option value="${opt}" ${modelA === opt ? 'selected' : ''}>${opt}</option>`
                     ).join('');
                     const modelBSelect = modelOptions.map(opt => 
-                        `<option value="${opt}" ${modelB === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                        `<option value="${opt}" ${modelB === opt ? 'selected' : ''}>${opt}</option>`
                     ).join('');
                     const modelCSelect = modelOptions.map(opt => 
-                        `<option value="${opt}" ${modelC === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                        `<option value="${opt}" ${modelC === opt ? 'selected' : ''}>${opt}</option>`
                     ).join('');
                     
                     html += `
-                        <td>
-                            <select class="editable-select" 
-                                    data-row="${rowId}" 
-                                    data-field="expertise"
-                                    onchange="onFieldChange('${rowId}', 'expertise', this.value)">
-                                ${expertiseSelect}
-                            </select>
-                        </td>
-                        <td style="text-align:center;">
-                            <select class="editable-select model-select" 
-                                    data-row="${rowId}" 
-                                    data-field="modelA"
-                                    onchange="onFieldChange('${rowId}', 'modelA', this.value)">
-                                ${modelASelect}
-                            </select>
-                        </td>
-                        <td style="text-align:center;">
-                            <select class="editable-select model-select" 
-                                    data-row="${rowId}" 
-                                    data-field="modelB"
-                                    onchange="onFieldChange('${rowId}', 'modelB', this.value)">
-                                ${modelBSelect}
-                            </select>
-                        </td>
-                        <td style="text-align:center;">
-                            <select class="editable-select model-select" 
-                                    data-row="${rowId}" 
-                                    data-field="modelC"
-                                    onchange="onFieldChange('${rowId}', 'modelC', this.value)">
-                                ${modelCSelect}
-                            </select>
-                        </td>
+                        <tr id="${rowId}" data-docid="${escapeHtml(docId)}" data-workplace="${escapeHtml(workplace)}" data-unit="${escapeHtml(unit)}">
+                            <td class="${cnfClass}">${escapeHtml(emp.name || '')}</td>
+                            <td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>
+                            <td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>
+                            <td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>
+                            <td>
+                                <select class="editable-select" 
+                                        data-row="${rowId}" 
+                                        data-field="expertise"
+                                        onchange="onFieldChange('${rowId}', 'expertise', this.value)">
+                                    ${expertiseSelect}
+                                </select>
+                            </td>
+                            <td style="text-align:center;">
+                                <select class="editable-select model-select" 
+                                        data-row="${rowId}" 
+                                        data-field="modelA"
+                                        onchange="onFieldChange('${rowId}', 'modelA', this.value)">
+                                    ${modelASelect}
+                                </select>
+                            </td>
+                            <td style="text-align:center;">
+                                <select class="editable-select model-select" 
+                                        data-row="${rowId}" 
+                                        data-field="modelB"
+                                        onchange="onFieldChange('${rowId}', 'modelB', this.value)">
+                                    ${modelBSelect}
+                                </select>
+                            </td>
+                            <td style="text-align:center;">
+                                <select class="editable-select model-select" 
+                                        data-row="${rowId}" 
+                                        data-field="modelC"
+                                        onchange="onFieldChange('${rowId}', 'modelC', this.value)">
+                                    ${modelCSelect}
+                                </select>
+                            </td>
+                        </tr>
                     `;
-                } else {
-                    html += `<td>${escapeHtml(expertise || '—')}</td>`;
-                }
+                });
                 
-                html += `</tr>`;
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+        
+    } else {
+        // ============================================================
+        // MODEL-A, MODEL-B, MODEL-C TABS - Single Table per Unit (No Workplace Grouping)
+        // ============================================================
+        units.forEach(unit => {
+            const employees = unitMap[unit];
+            const totalCount = employees.length;
+            
+            html += `
+                <div class="unit-header-view">
+                    <i class="fa fa-building"></i> ${escapeHtml(unit)}
+                    <span class="total-count">
+                        - Total: <span class="num">${totalCount}</span>
+                    </span>
+                </div>
+                <div class="table-responsive-wrapper">
+                    <table class="data-table view-table">
+                        <thead>
+                            <tr>
+                                <th style="min-width:120px;">Name</th>
+                                <th style="min-width:80px;">Role</th>
+                                <th style="min-width:120px;">Designation</th>
+                                <th style="min-width:80px;">Type</th>
+                                <th style="min-width:160px;">Expertise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            employees.forEach(emp => {
+                const isCNF = emp.type && emp.type.toUpperCase() === 'CNF';
+                const cnfClass = isCNF ? 'text-cnf' : '';
+                
+                html += `
+                    <tr>
+                        <td class="${cnfClass}">${escapeHtml(emp.name || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>
+                        <td>${escapeHtml(emp.expertise || '—')}</td>
+                    </tr>
+                `;
             });
             
             html += `
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             `;
         });
-    });
+    }
     
     container.innerHTML = html;
     updateChangeStatus();
@@ -1535,7 +1591,7 @@ async function saveAllChanges() {
         if (!row) continue;
         
         const docId = row.dataset.docid;
-        const name = row.querySelector('.name-cell')?.textContent || '';
+        const name = row.querySelector('td:first-child')?.textContent || '';
         
         const update = {};
         if (rowChanges.expertise !== undefined) update.expertise = rowChanges.expertise;
