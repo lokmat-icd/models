@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICD Unit Dashboard</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .container-fluid { max-width: 1400px; margin: 0 auto; }
+
+        /* LOGIN OVERLAY */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #loginOverlay .login-box {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 420px;
+            width: 100%;
+        }
+        #loginOverlay .login-box .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        #loginOverlay .login-box .logo img {
+            width: 100%;
+            height: auto;
+            max-height: 80px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 8px;
+        }
+        #loginOverlay .login-box h3 {
+            text-align: center;
+            color: #1a3a6b;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        #loginOverlay .login-box p.sub {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        #loginOverlay .login-box .form-group {
+            margin-bottom: 18px;
+        }
+        #loginOverlay .login-box .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
+        #loginOverlay .login-box .form-group input {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px 14px;
+            font-size: 14px;
+            width: 100%;
+        }
+        #loginOverlay .login-box .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42,82,152,0.15);
+        }
+        #loginOverlay .login-box .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1a3a6b 0%, #2a5298 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #loginOverlay .login-box .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(42,82,152,0.3);
+        }
+        #loginOverlay .login-box .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #loginOverlay .login-box .login-error {
+            color: #dc3545;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+        #loginOverlay .login-box .login-error.show { display: block; }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #1a3a6b 0%, #2a5298 100%);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .header-row1 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px 15px;
+            min-height: 48px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-logo {
+            height: 42px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px 4px 16px;
+            border-radius: 30px;
+            flex-shrink: 0;
+        }
+        .header-user .user-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .header-user .user-role {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        .header-user .logout-header-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .header-user .logout-header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* TOOLBAR - Row 1 */
+        .toolbar {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .toolbar .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .toolbar .filter-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+            margin: 0;
+        }
+        .toolbar .filter-group select,
+        .toolbar .filter-group input {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            min-width: 140px;
+        }
+        .toolbar .filter-group select:focus,
+        .toolbar .filter-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42,82,152,0.1);
+        }
+        .toolbar .filter-group input {
+            min-width: 180px;
+        }
+
+        /* FILTER ROW - Row 2 */
+        .filter-row {
+            background: white;
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            align-items: center;
+            border-left: 4px solid #ff9800;
+        }
+        .filter-row .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-row .filter-group label {
+            font-weight: 600;
+            font-size: 12px;
+            color: #555;
+            margin: 0;
+            white-space: nowrap;
+        }
+        .filter-row .filter-group select {
+            padding: 4px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            min-width: 100px;
+        }
+        .filter-row .filter-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42,82,152,0.1);
+        }
+        .filter-row .clear-filters-btn {
+            padding: 4px 14px;
+            border: none;
+            border-radius: 4px;
+            background: #dc3545;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+        .filter-row .clear-filters-btn:hover {
+            background: #c82333;
+        }
+
+        /* ACTION ROW - Row 3 */
+        .action-row {
+            background: white;
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .action-row .action-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+        .action-row .edit-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #ff9800;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-row .edit-btn:hover {
+            background: #e68900;
+        }
+        .action-row .edit-btn.active {
+            background: #dc3545;
+        }
+        .action-row .edit-btn.active:hover {
+            background: #c82333;
+        }
+        .action-row .edit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-row .save-all-btn {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 6px;
+            background: #28a745;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-row .save-all-btn:hover {
+            background: #218838;
+        }
+        .action-row .save-all-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-row .refresh-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #17a2b8;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .action-row .refresh-btn:hover {
+            background: #138496;
+        }
+        .action-row .save-status {
+            font-size: 13px;
+            display: none;
+        }
+        .action-row .save-status.show {
+            display: inline-block;
+        }
+        .action-row .save-status.saving {
+            color: #ff9800;
+        }
+        .action-row .save-status.saved {
+            color: #28a745;
+        }
+        .action-row .save-status.error {
+            color: #dc3545;
+        }
+        .action-row .change-count {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+        }
+        .action-row .change-count .num {
+            color: #ff9800;
+            font-weight: 700;
+        }
+        .action-row .mode-indicator {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+        .action-row .mode-indicator.view-mode {
+            background: #e8ecf1;
+            color: #666;
+        }
+        .action-row .mode-indicator.edit-mode {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* FILTER INDICATOR */
+        .filter-indicator {
+            font-size: 12px;
+            color: #666;
+            padding: 4px 12px;
+            background: #f0f2f5;
+            border-radius: 4px;
+            display: none;
+        }
+        .filter-indicator.show {
+            display: inline-block;
+        }
+
+        /* WORKPLACE GROUP */
+        .workplace-group {
+            margin-bottom: 24px;
+            border: 1px solid #e8ecf1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .workplace-group .workplace-header {
+            background: #f0f2f5;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1a3a6b;
+            border-bottom: 2px solid #e8ecf1;
+        }
+        .workplace-group .workplace-header .workplace-name {
+            font-size: 14px;
+        }
+        .workplace-group .workplace-header .workplace-name i {
+            margin-right: 8px;
+        }
+        .workplace-group .workplace-header .employee-count {
+            font-weight: 400;
+            font-size: 13px;
+            color: #555;
+        }
+        .workplace-group .workplace-header .employee-count .num {
+            font-weight: 700;
+            color: #1a3a6b;
+        }
+
+        /* UNIT HEADER */
+        .unit-header {
+            padding: 12px 0 8px 0;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a3a6b;
+            border-bottom: 2px solid #1a3a6b;
+            margin-bottom: 16px;
+        }
+        .unit-header i {
+            margin-right: 8px;
+        }
+
+        /* TABLE */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .data-table th {
+            background: #2a5298;
+            color: white;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #e8ecf1;
+            vertical-align: middle;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table tr:hover td {
+            background: #f8f9fa;
+        }
+        .data-table .editable-select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            width: 100%;
+            min-width: 140px;
+            background: #f5f5f5;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: not-allowed;
+            color: #666;
+        }
+        .data-table .editable-select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42,82,152,0.1);
+        }
+        .data-table .editable-select.enabled {
+            background: white;
+            cursor: pointer;
+            color: #333;
+        }
+        .data-table .editable-select.enabled:focus {
+            border-color: #2a5298;
+        }
+        .data-table .editable-select.changed {
+            border-color: #ff9800;
+            background: #fff8e1;
+        }
+        .data-table .editable-select.changed.enabled {
+            background: #fff8e1;
+        }
+        .data-table .editable-select.model-select {
+            min-width: 70px;
+            text-align: center;
+        }
+        .data-table .name-cell {
+            font-weight: 600;
+            color: #1a3a6b;
+        }
+        .data-table .text-cnf {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
+        /* EMPTY STATE */
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            background: white;
+            border-radius: 8px;
+        }
+        .no-data i {
+            font-size: 36px;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* LOADING */
+        .loading-spinner {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+        .loading-spinner i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+            color: #2a5298;
+        }
+
+        /* TOAST */
+        .custom-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-toast.success { background: #28a745; }
+        .custom-toast.error { background: #dc3545; }
+        .custom-toast.info { background: #17a2b8; }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header-row1 { flex-direction: column; align-items: center; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar .filter-group { flex-wrap: wrap; }
+            .toolbar .filter-group select { min-width: 100%; }
+            .toolbar .filter-group input { min-width: 100%; }
+            .filter-row { flex-direction: column; align-items: stretch; }
+            .filter-row .filter-group { flex-wrap: wrap; }
+            .filter-row .filter-group select { min-width: 100%; }
+            .filter-row .clear-filters-btn { margin-left: 0; }
+            .action-row { flex-direction: column; align-items: stretch; }
+            .action-row .action-group { margin-left: 0; justify-content: center; }
+            .data-table { font-size: 11px; }
+            .data-table th, .data-table td { padding: 5px 8px; }
+            .data-table .editable-select { min-width: 80px; font-size: 11px; }
+            .data-table .editable-select.model-select { min-width: 50px; }
+            #loginOverlay .login-box { padding: 30px 25px; margin: 15px; }
+        }
+        @media (max-width: 480px) {
+            .data-table .editable-select { min-width: 60px; font-size: 10px; }
+            .data-table .editable-select.model-select { min-width: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+    <div class="login-box">
+        <div class="logo">
+            <img src="https://lh3.googleusercontent.com/d/1uLdST5g0rbVFpAV_i7qJXAI1nZJo20lQ" alt="LOKMAT">
+            <h3>ICD Unit Dashboard</h3>
+            <p class="sub">View & manage your unit's employees</p>
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+            <i class="fa fa-sign-in"></i> Sign In
+        </button>
+        <div class="login-error" id="loginError">Invalid email or password. Please try again.</div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid" id="mainContent" style="display:none;">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-row1">
+            <div class="header-left">
+                <img src="https://lh3.googleusercontent.com/d/1uLdST5g0rbVFpAV_i7qJXAI1nZJo20lQ" 
+                     alt="LOKMAT" class="header-logo"
+                     onerror="this.style.display='none'">
+            </div>
+            <div class="header-user">
+                <div>
+                    <div class="user-name" id="headerUserName">User</div>
+                    <div class="user-role" id="headerUserRole">Role</div>
+                </div>
+                <button class="logout-header-btn" onclick="logout()"><i class="fa fa-sign-out"></i> Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR - Row 1: Unit, Workplace, Search -->
+    <div class="toolbar" id="toolbar">
+        <div class="filter-group">
+            <label>Unit:</label>
+            <select id="unitSelect" onchange="onUnitChange()">
+                <option value="all">All Units</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Workplace:</label>
+            <select id="workplaceSelect" onchange="applyFilters()">
+                <option value="all">All Workplaces</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <input type="text" id="searchInput" placeholder="🔍 Search by name..." onkeyup="applyFilters()">
+        </div>
+    </div>
+
+    <!-- FILTER ROW - Row 2: Additional Filters -->
+    <div class="filter-row" id="filterRow">
+        <div class="filter-group">
+            <label>CNF:</label>
+            <select id="filterType" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="CNF">CNF</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Expertise:</label>
+            <select id="filterExpertise" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="Creative/Feature">Creative/Feature</option>
+                <option value="NP-Design">NP-Design</option>
+                <option value="Versatile">Versatile</option>
+                <option value="PDF/QC">PDF/QC</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Model-A:</label>
+            <select id="filterModelA" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Model-B:</label>
+            <select id="filterModelB" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Model-C:</label>
+            <select id="filterModelC" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <button class="clear-filters-btn" onclick="clearFilters()">
+            <i class="fa fa-times"></i> Clear All
+        </button>
+        <span class="filter-indicator" id="filterIndicator"></span>
+    </div>
+
+    <!-- ACTION ROW - Row 3: Edit/Save/Refresh -->
+    <div class="action-row" id="actionRow">
+        <span class="mode-indicator view-mode" id="modeIndicator">👁️ View Mode</span>
+        <div class="action-group">
+            <button class="edit-btn" id="editBtn" onclick="toggleEditMode()">
+                <i class="fa fa-pencil"></i> Edit Data
+            </button>
+            <button class="save-all-btn" id="saveBtn" onclick="saveAllChanges()" disabled>
+                <i class="fa fa-save"></i> Save All Changes
+            </button>
+            <button class="refresh-btn" onclick="refreshData()">
+                <i class="fa fa-refresh"></i> Refresh
+            </button>
+            <span class="save-status" id="statusMessage"></span>
+            <span class="change-count" id="changeCount">No changes</span>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="contentArea">
+        <div class="loading-spinner">
+            <i class="fa fa-spinner fa-spin"></i>
+            Loading employee data from Firestore...
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+// FIREBASE CONFIGURATION
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAJq0tKzIqgMnjHnNvxMye2XhqGuw1rYyE",
+    authDomain: "analysis-2e479.firebaseapp.com",
+    projectId: "analysis-2e479",
+    storageBucket: "analysis-2e479.firebasestorage.app",
+    messagingSenderId: "565408773918",
+    appId: "1:565408773918:web:39f9e0e139686db994bb0f",
+    measurementId: "G-WV3N3G9CY4"
+};
+
+// Initialize Firebase with Auth
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+let loggedInUser = null;
+let allEmployees = [];
+let filteredEmployees = [];
+let employeeChanges = {};
+let isSaving = false;
+let selectedUnit = 'all';
+let selectedWorkplace = 'all';
+let searchQuery = '';
+let isAdmin = false;
+let isEditMode = false;
+
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+function getDocumentIdFromEmail(email) {
+    if (!email) return null;
+    return email.toLowerCase().replace(/[@.]/g, '_');
+}
+
+function showToast(message, type) {
+    const existing = document.querySelector('.custom-toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast ' + (type || 'info');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ============================================================
+// EDIT MODE TOGGLE
+// ============================================================
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const modeIndicator = document.getElementById('modeIndicator');
+    
+    if (isEditMode) {
+        editBtn.innerHTML = '<i class="fa fa-times"></i> Cancel Edit';
+        editBtn.classList.add('active');
+        modeIndicator.className = 'mode-indicator edit-mode';
+        modeIndicator.textContent = '✏️ Edit Mode';
+        saveBtn.disabled = true;
+        
+        document.querySelectorAll('.editable-select').forEach(sel => {
+            sel.disabled = false;
+            sel.classList.add('enabled');
+        });
+        
+        // Disable filters in edit mode
+        document.getElementById('filterType').disabled = true;
+        document.getElementById('filterExpertise').disabled = true;
+        document.getElementById('filterModelA').disabled = true;
+        document.getElementById('filterModelB').disabled = true;
+        document.getElementById('filterModelC').disabled = true;
+        
+        showToast('Edit mode enabled - make your changes', 'info');
+    } else {
+        // Cancel edit - discard changes
+        employeeChanges = {};
+        editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
+        editBtn.classList.remove('active');
+        modeIndicator.className = 'mode-indicator view-mode';
+        modeIndicator.textContent = '👁️ View Mode';
+        saveBtn.disabled = true;
+        
+        document.querySelectorAll('.editable-select').forEach(sel => {
+            sel.disabled = true;
+            sel.classList.remove('enabled');
+            sel.classList.remove('changed');
+        });
+        
+        // Enable filters
+        document.getElementById('filterType').disabled = false;
+        document.getElementById('filterExpertise').disabled = false;
+        document.getElementById('filterModelA').disabled = false;
+        document.getElementById('filterModelB').disabled = false;
+        document.getElementById('filterModelC').disabled = false;
+        
+        refreshData();
+        updateChangeStatus();
+        showToast('Edit cancelled - changes discarded', 'info');
+    }
+}
+
+// ============================================================
+// LOGIN SYSTEM
+// ============================================================
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const errorEl = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    errorEl.classList.remove('show');
+    
+    if (!email || !password) {
+        errorEl.textContent = 'Please enter both email and password.';
+        errorEl.classList.add('show');
+        return;
+    }
+    
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Authenticating...';
+    
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        const userDocId = getDocumentIdFromEmail(email);
+        const userDoc = await db.collection('users').doc(userDocId).get();
+        
+        if (userDoc.exists) {
+            loggedInUser = {
+                id: userDoc.id,
+                ...userDoc.data()
+            };
+        } else {
+            loggedInUser = {
+                id: userDocId,
+                email: email,
+                name: email.split('@')[0],
+                role: 'user'
+            };
+            await db.collection('users').doc(userDocId).set(loggedInUser);
+        }
+        
+        isAdmin = loggedInUser.role === 'Admin';
+        
+        if (loggedInUser.units && typeof loggedInUser.units === 'string') {
+            loggedInUser.units = loggedInUser.units.split(',').map(u => u.trim()).filter(u => u);
+        } else if (typeof loggedInUser.units === 'object' && Array.isArray(loggedInUser.units)) {
+            // Already an array
+        } else if (loggedInUser.unit) {
+            loggedInUser.units = [loggedInUser.unit];
+        } else {
+            loggedInUser.units = [];
+        }
+        
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('headerUserName').textContent = loggedInUser.name || loggedInUser.email || 'User';
+        document.getElementById('headerUserRole').textContent = (loggedInUser.role || '') + 
+            (loggedInUser.role === 'ICD Head' && loggedInUser.units.length > 0 ? ' - ' + loggedInUser.units.join(', ') : '');
+        
+        await loadEmployees();
+        
+    } catch(error) {
+        console.error('Login error:', error);
+        errorEl.textContent = error.message || 'Invalid email or password.';
+        errorEl.classList.add('show');
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fa fa-sign-in"></i> Sign In';
+    }
+}
+
+function logout() {
+    auth.signOut().then(() => {
+        loggedInUser = null;
+        allEmployees = [];
+        filteredEmployees = [];
+        employeeChanges = {};
+        isEditMode = false;
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginError').classList.remove('show');
+        document.getElementById('loginBtn').disabled = false;
+        document.getElementById('loginBtn').innerHTML = '<i class="fa fa-sign-in"></i> Sign In';
+        showToast('Logged out successfully', 'info');
+    }).catch(error => {
+        console.error('Logout error:', error);
+    });
+}
+
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        const email = user.email;
+        const userDocId = getDocumentIdFromEmail(email);
+        const userDoc = await db.collection('users').doc(userDocId).get();
+        
+        if (userDoc.exists) {
+            loggedInUser = {
+                id: userDoc.id,
+                ...userDoc.data()
+            };
+        } else {
+            loggedInUser = {
+                id: userDocId,
+                email: email,
+                name: email.split('@')[0],
+                role: 'user'
+            };
+        }
+        
+        isAdmin = loggedInUser.role === 'Admin';
+        
+        if (loggedInUser.units && typeof loggedInUser.units === 'string') {
+            loggedInUser.units = loggedInUser.units.split(',').map(u => u.trim()).filter(u => u);
+        } else if (typeof loggedInUser.units === 'object' && Array.isArray(loggedInUser.units)) {
+            // Already an array
+        } else if (loggedInUser.unit) {
+            loggedInUser.units = [loggedInUser.unit];
+        } else {
+            loggedInUser.units = [];
+        }
+        
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('headerUserName').textContent = loggedInUser.name || loggedInUser.email || 'User';
+        document.getElementById('headerUserRole').textContent = (loggedInUser.role || '') + 
+            (loggedInUser.role === 'ICD Head' && loggedInUser.units.length > 0 ? ' - ' + loggedInUser.units.join(', ') : '');
+        
+        await loadEmployees();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('loginEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+    });
+});
+
+// ============================================================
+// LOAD EMPLOYEES FROM FIRESTORE
+// ============================================================
+async function loadEmployees() {
+    try {
+        document.getElementById('contentArea').innerHTML = `
+            <div class="loading-spinner">
+                <i class="fa fa-spinner fa-spin"></i>
+                Loading employee data from Firestore...
+            </div>
+        `;
+        
+        const usersSnapshot = await db.collection('users').get();
+        allEmployees = [];
+        usersSnapshot.forEach(doc => {
+            const data = doc.data();
+            allEmployees.push({
+                id: doc.id,
+                documentId: doc.id,
+                ...data
+            });
+        });
+        
+        let filteredAll = allEmployees;
+        if (!isAdmin) {
+            const units = loggedInUser.units || [];
+            filteredAll = allEmployees.filter(emp => {
+                const empUnit = emp.unit || '';
+                return units.some(u => empUnit.toLowerCase() === u.toLowerCase());
+            });
+        }
+        
+        allEmployees = filteredAll;
+        
+        // Populate unit dropdown with "All Units"
+        populateUnitDropdown();
+        updateWorkplaceDropdown();
+        applyFilters();
+        showToast('Data loaded from Firestore!', 'success');
+        
+    } catch(error) {
+        console.error('Error loading employees:', error);
+        document.getElementById('contentArea').innerHTML = `
+            <div class="no-data">
+                <i class="fa fa-exclamation-triangle"></i>
+                Error loading data: ${escapeHtml(error.message)}
+            </div>
+        `;
+        showToast('Error loading data: ' + error.message, 'error');
+    }
+}
+
+// ============================================================
+// POPULATE UNIT DROPDOWN
+// ============================================================
+function populateUnitDropdown() {
+    const unitSelect = document.getElementById('unitSelect');
+    let units = [];
+    
+    if (isAdmin) {
+        units = [...new Set(allEmployees.map(emp => emp.unit || '').filter(u => u))];
+    } else {
+        units = loggedInUser.units || [];
+    }
+    
+    unitSelect.innerHTML = '';
+    
+    // Add "All Units" option first
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = 'All Units';
+    unitSelect.appendChild(allOption);
+    
+    // Add individual units
+    units.sort().forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        unitSelect.appendChild(option);
+    });
+    
+    selectedUnit = 'all';
+    unitSelect.value = 'all';
+}
+
+// ============================================================
+// UPDATE WORKPLACE DROPDOWN
+// ============================================================
+function updateWorkplaceDropdown() {
+    const workplaceSelect = document.getElementById('workplaceSelect');
+    let employees = [];
+    
+    if (selectedUnit === 'all') {
+        employees = allEmployees;
+    } else {
+        employees = allEmployees.filter(emp => (emp.unit || '') === selectedUnit);
+    }
+    
+    const workplaces = [...new Set(employees.map(emp => emp.workplace || '').filter(w => w))];
+    
+    workplaceSelect.innerHTML = '';
+    
+    // Add "All Workplaces" option first
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = 'All Workplaces';
+    workplaceSelect.appendChild(allOption);
+    
+    // Add individual workplaces
+    workplaces.sort().forEach(w => {
+        const option = document.createElement('option');
+        option.value = w;
+        option.textContent = w;
+        workplaceSelect.appendChild(option);
+    });
+    
+    selectedWorkplace = 'all';
+    workplaceSelect.value = 'all';
+}
+
+// ============================================================
+// REFRESH DATA
+// ============================================================
+async function refreshData() {
+    employeeChanges = {};
+    if (isEditMode) {
+        isEditMode = false;
+        const editBtn = document.getElementById('editBtn');
+        const modeIndicator = document.getElementById('modeIndicator');
+        editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
+        editBtn.classList.remove('active');
+        modeIndicator.className = 'mode-indicator view-mode';
+        modeIndicator.textContent = '👁️ View Mode';
+        
+        document.getElementById('filterType').disabled = false;
+        document.getElementById('filterExpertise').disabled = false;
+        document.getElementById('filterModelA').disabled = false;
+        document.getElementById('filterModelB').disabled = false;
+        document.getElementById('filterModelC').disabled = false;
+    }
+    await loadEmployees();
+    showToast('Data refreshed from Firestore!', 'info');
+}
+
+// ============================================================
+// UNIT CHANGE
+// ============================================================
+function onUnitChange() {
+    selectedUnit = document.getElementById('unitSelect').value;
+    employeeChanges = {};
+    updateWorkplaceDropdown();
+    applyFilters();
+}
+
+// ============================================================
+// APPLY FILTERS
+// ============================================================
+function applyFilters() {
+    selectedUnit = document.getElementById('unitSelect').value;
+    selectedWorkplace = document.getElementById('workplaceSelect').value;
+    searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+    
+    // Get filter values
+    const filterType = document.getElementById('filterType').value;
+    const filterExpertise = document.getElementById('filterExpertise').value;
+    const filterModelA = document.getElementById('filterModelA').value;
+    const filterModelB = document.getElementById('filterModelB').value;
+    const filterModelC = document.getElementById('filterModelC').value;
+    
+    // STEP 1: Filter by selected Unit (or all units)
+    let filtered = [];
+    if (selectedUnit === 'all') {
+        filtered = allEmployees;
+    } else {
+        filtered = allEmployees.filter(emp => (emp.unit || '') === selectedUnit);
+    }
+    
+    // STEP 2: Filter by selected Workplace (or all workplaces)
+    if (selectedWorkplace !== 'all') {
+        filtered = filtered.filter(emp => (emp.workplace || '') === selectedWorkplace);
+    }
+    
+    // STEP 3: Filter by Type (CNF)
+    if (filterType !== 'all') {
+        filtered = filtered.filter(emp => (emp.type || '').toUpperCase() === filterType.toUpperCase());
+    }
+    
+    // STEP 4: Filter by Expertise
+    if (filterExpertise !== 'all') {
+        filtered = filtered.filter(emp => (emp.expertise || '') === filterExpertise);
+    }
+    
+    // STEP 5: Filter by Model-A
+    if (filterModelA !== 'all') {
+        const isYes = filterModelA === 'yes';
+        filtered = filtered.filter(emp => emp.modelA === isYes);
+    }
+    
+    // STEP 6: Filter by Model-B
+    if (filterModelB !== 'all') {
+        const isYes = filterModelB === 'yes';
+        filtered = filtered.filter(emp => emp.modelB === isYes);
+    }
+    
+    // STEP 7: Filter by Model-C
+    if (filterModelC !== 'all') {
+        const isYes = filterModelC === 'yes';
+        filtered = filtered.filter(emp => emp.modelC === isYes);
+    }
+    
+    // STEP 8: Search by name
+    if (searchQuery) {
+        filtered = filtered.filter(emp => 
+            (emp.name || '').toLowerCase().includes(searchQuery)
+        );
+    }
+    
+    filteredEmployees = filtered;
+    renderContent();
+    updateFilterIndicator();
+}
+
+// ============================================================
+// UPDATE FILTER INDICATOR
+// ============================================================
+function updateFilterIndicator() {
+    const filterType = document.getElementById('filterType').value;
+    const filterExpertise = document.getElementById('filterExpertise').value;
+    const filterModelA = document.getElementById('filterModelA').value;
+    const filterModelB = document.getElementById('filterModelB').value;
+    const filterModelC = document.getElementById('filterModelC').value;
+    const workplace = document.getElementById('workplaceSelect').value;
+    const unit = document.getElementById('unitSelect').value;
+    
+    let filterParts = [];
+    if (unit !== 'all') filterParts.push(`Unit: ${unit}`);
+    if (workplace !== 'all') filterParts.push(`Workplace: ${workplace}`);
+    if (filterType !== 'all') filterParts.push(`Type: ${filterType}`);
+    if (filterExpertise !== 'all') filterParts.push(`Expertise: ${filterExpertise}`);
+    if (filterModelA !== 'all') filterParts.push(`Model-A: ${filterModelA === 'yes' ? 'Yes' : 'No'}`);
+    if (filterModelB !== 'all') filterParts.push(`Model-B: ${filterModelB === 'yes' ? 'Yes' : 'No'}`);
+    if (filterModelC !== 'all') filterParts.push(`Model-C: ${filterModelC === 'yes' ? 'Yes' : 'No'}`);
+    
+    const indicator = document.getElementById('filterIndicator');
+    if (filterParts.length > 0) {
+        indicator.textContent = '🔍 ' + filterParts.join(' → ');
+        indicator.className = 'filter-indicator show';
+    } else {
+        indicator.className = 'filter-indicator';
+    }
+}
+
+// ============================================================
+// CLEAR ALL FILTERS
+// ============================================================
+function clearFilters() {
+    document.getElementById('filterType').value = 'all';
+    document.getElementById('filterExpertise').value = 'all';
+    document.getElementById('filterModelA').value = 'all';
+    document.getElementById('filterModelB').value = 'all';
+    document.getElementById('filterModelC').value = 'all';
+    applyFilters();
+    showToast('All filters cleared', 'info');
+}
+
+// ============================================================
+// RENDER CONTENT - GROUPED BY UNIT THEN WORKPLACE
+// ============================================================
+function renderContent() {
+    const container = document.getElementById('contentArea');
+    
+    if (!filteredEmployees || filteredEmployees.length === 0) {
+        container.innerHTML = `
+            <div class="no-data">
+                <i class="fa fa-users"></i>
+                No employees found for the selected filters.
+            </div>
+        `;
+        updateChangeStatus();
+        return;
+    }
+    
+    // Group by unit first, then by workplace
+    const unitMap = {};
+    filteredEmployees.forEach(emp => {
+        const unit = emp.unit || 'Unknown';
+        if (!unitMap[unit]) unitMap[unit] = [];
+        unitMap[unit].push(emp);
+    });
+    
+    const units = Object.keys(unitMap).sort();
+    let html = '';
+    
+    units.forEach(unit => {
+        const unitEmployees = unitMap[unit];
+        
+        // Group by workplace within each unit
+        const workplaceMap = {};
+        unitEmployees.forEach(emp => {
+            const workplace = emp.workplace || 'Unknown';
+            if (!workplaceMap[workplace]) workplaceMap[workplace] = [];
+            workplaceMap[workplace].push(emp);
+        });
+        
+        const workplaces = Object.keys(workplaceMap).sort();
+        
+        // Show unit header if multiple units are shown
+        if (units.length > 1) {
+            html += `
+                <div class="unit-header">
+                    <i class="fa fa-building"></i> ${escapeHtml(unit)}
+                </div>
+            `;
+        }
+        
+        workplaces.forEach(workplace => {
+            const employees = workplaceMap[workplace];
+            const employeeCount = employees.length;
+            
+            html += `
+                <div class="workplace-group">
+                    <div class="workplace-header">
+                        <span class="workplace-name">
+                            <i class="fa fa-location-arrow"></i>
+                            ${escapeHtml(workplace)}
+                        </span>
+                        <span class="employee-count">
+                            Employees: <span class="num">${employeeCount}</span>
+                        </span>
+                    </div>
+                    <div class="table-responsive-wrapper">
+                        <table class="data-table" id="table_${escapeHtml(unit)}_${escapeHtml(workplace)}">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:120px;">Name</th>
+                                    <th style="min-width:80px;">Role</th>
+                                    <th style="min-width:120px;">Designation</th>
+                                    <th style="min-width:80px;">Type</th>
+                                    <th style="min-width:160px;">Expertise</th>
+                                    <th style="min-width:80px;text-align:center;">Model-A</th>
+                                    <th style="min-width:80px;text-align:center;">Model-B</th>
+                                    <th style="min-width:80px;text-align:center;">Model-C</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            employees.forEach((emp, index) => {
+                const rowId = 'row_' + unit.replace(/[^a-zA-Z0-9]/g, '_') + '_' + workplace.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
+                const docId = emp.documentId || emp.id || '';
+                
+                const expertise = emp.expertise || '';
+                const modelA = emp.modelA !== undefined ? (emp.modelA ? 'Yes' : 'No') : '';
+                const modelB = emp.modelB !== undefined ? (emp.modelB ? 'Yes' : 'No') : '';
+                const modelC = emp.modelC !== undefined ? (emp.modelC ? 'Yes' : 'No') : '';
+                
+                const isCNF = emp.type && emp.type.toUpperCase() === 'CNF';
+                const cnfClass = isCNF ? 'text-cnf' : '';
+                
+                const expertiseOptions = ['', 'Creative/Feature', 'NP-Design', 'Versatile', 'PDF/QC'];
+                const expertiseSelect = expertiseOptions.map(opt => 
+                    `<option value="${opt}" ${expertise === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                ).join('');
+                
+                const modelOptions = ['', 'Yes', 'No'];
+                const modelASelect = modelOptions.map(opt => 
+                    `<option value="${opt}" ${modelA === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                ).join('');
+                const modelBSelect = modelOptions.map(opt => 
+                    `<option value="${opt}" ${modelB === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                ).join('');
+                const modelCSelect = modelOptions.map(opt => 
+                    `<option value="${opt}" ${modelC === opt ? 'selected' : ''}>${opt || '—'}</option>`
+                ).join('');
+                
+                const disabledAttr = isEditMode ? '' : 'disabled';
+                const enabledClass = isEditMode ? 'enabled' : '';
+                
+                html += `
+                    <tr id="${rowId}" data-docid="${escapeHtml(docId)}" data-workplace="${escapeHtml(workplace)}" data-unit="${escapeHtml(unit)}">
+                        <td class="name-cell ${cnfClass}">${escapeHtml(emp.name || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.role || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.designation || '')}</td>
+                        <td class="${cnfClass}">${escapeHtml(emp.type || '')}</td>
+                        <td>
+                            <select class="editable-select ${enabledClass}" 
+                                    data-row="${rowId}" 
+                                    data-field="expertise"
+                                    onchange="onFieldChange('${rowId}', 'expertise', this.value)"
+                                    ${disabledAttr}>
+                                ${expertiseSelect}
+                            </select>
+                        </td>
+                        <td style="text-align:center;">
+                            <select class="editable-select model-select ${enabledClass}" 
+                                    data-row="${rowId}" 
+                                    data-field="modelA"
+                                    onchange="onFieldChange('${rowId}', 'modelA', this.value)"
+                                    ${disabledAttr}>
+                                ${modelASelect}
+                            </select>
+                        </td>
+                        <td style="text-align:center;">
+                            <select class="editable-select model-select ${enabledClass}" 
+                                    data-row="${rowId}" 
+                                    data-field="modelB"
+                                    onchange="onFieldChange('${rowId}', 'modelB', this.value)"
+                                    ${disabledAttr}>
+                                ${modelBSelect}
+                            </select>
+                        </td>
+                        <td style="text-align:center;">
+                            <select class="editable-select model-select ${enabledClass}" 
+                                    data-row="${rowId}" 
+                                    data-field="modelC"
+                                    onchange="onFieldChange('${rowId}', 'modelC', this.value)"
+                                    ${disabledAttr}>
+                                ${modelCSelect}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        });
+    });
+    
+    container.innerHTML = html;
+    updateChangeStatus();
+}
+
+// ============================================================
+// FIELD CHANGE HANDLER
+// ============================================================
+function onFieldChange(rowId, field, value) {
+    if (!isEditMode) return;
+    
+    if (!employeeChanges[rowId]) {
+        employeeChanges[rowId] = {};
+    }
+    employeeChanges[rowId][field] = value;
+    
+    const select = document.querySelector(`[data-row="${rowId}"][data-field="${field}"]`);
+    if (select) {
+        select.classList.add('changed');
+    }
+    
+    updateChangeStatus();
+}
+
+// ============================================================
+// UPDATE CHANGE STATUS
+// ============================================================
+function updateChangeStatus() {
+    let totalChanges = 0;
+    for (let rowId in employeeChanges) {
+        const changes = employeeChanges[rowId];
+        if (changes.expertise !== undefined || changes.modelA !== undefined || changes.modelB !== undefined || changes.modelC !== undefined) {
+            totalChanges++;
+        }
+    }
+    
+    const countEl = document.getElementById('changeCount');
+    const saveBtn = document.getElementById('saveBtn');
+    
+    if (countEl) {
+        if (totalChanges > 0) {
+            countEl.innerHTML = `<span class="num">${totalChanges}</span> row(s) changed`;
+        } else {
+            countEl.textContent = 'No changes';
+        }
+    }
+    
+    if (saveBtn) {
+        saveBtn.disabled = !(isEditMode && totalChanges > 0);
+    }
+}
+
+// ============================================================
+// SAVE ALL CHANGES TO FIRESTORE
+// ============================================================
+async function saveAllChanges() {
+    if (!isEditMode) {
+        showToast('Please enter Edit Mode first', 'info');
+        return;
+    }
+    
+    const updates = [];
+    let hasChanges = false;
+    
+    for (let rowId in employeeChanges) {
+        const rowChanges = employeeChanges[rowId];
+        const row = document.getElementById(rowId);
+        if (!row) continue;
+        
+        const docId = row.dataset.docid;
+        const name = row.querySelector('.name-cell')?.textContent || '';
+        
+        const update = {};
+        if (rowChanges.expertise !== undefined) update.expertise = rowChanges.expertise;
+        if (rowChanges.modelA !== undefined) update.modelA = rowChanges.modelA === 'Yes';
+        if (rowChanges.modelB !== undefined) update.modelB = rowChanges.modelB === 'Yes';
+        if (rowChanges.modelC !== undefined) update.modelC = rowChanges.modelC === 'Yes';
+        
+        if (Object.keys(update).length > 0) {
+            hasChanges = true;
+            updates.push({
+                docId: docId,
+                name: name,
+                updates: update
+            });
+        }
+    }
+    
+    if (!hasChanges) {
+        showToast('No changes to save', 'info');
+        return;
+    }
+    
+    if (isSaving) return;
+    isSaving = true;
+    
+    const saveBtn = document.getElementById('saveBtn');
+    const statusEl = document.getElementById('statusMessage');
+    
+    saveBtn.disabled = true;
+    statusEl.className = 'save-status show saving';
+    statusEl.textContent = '⏳ Saving to Firestore...';
+    
+    try {
+        const batch = db.batch();
+        
+        for (const update of updates) {
+            const docRef = db.collection('users').doc(update.docId);
+            batch.update(docRef, update.updates);
+        }
+        
+        await batch.commit();
+        
+        // Update local data
+        updates.forEach(update => {
+            const emp = allEmployees.find(e => (e.documentId || e.id) === update.docId);
+            if (emp) {
+                if (update.updates.expertise !== undefined) emp.expertise = update.updates.expertise;
+                if (update.updates.modelA !== undefined) emp.modelA = update.updates.modelA;
+                if (update.updates.modelB !== undefined) emp.modelB = update.updates.modelB;
+                if (update.updates.modelC !== undefined) emp.modelC = update.updates.modelC;
+            }
+        });
+        
+        employeeChanges = {};
+        updateChangeStatus();
+        
+        document.querySelectorAll('.editable-select.changed').forEach(el => {
+            el.classList.remove('changed');
+        });
+        
+        statusEl.className = 'save-status show saved';
+        statusEl.textContent = '✓ Saved to Firestore successfully';
+        showToast(`${updates.length} record(s) saved to Firestore!`, 'success');
+        
+        setTimeout(() => {
+            statusEl.className = 'save-status';
+        }, 3000);
+        
+        // Exit edit mode after successful save
+        if (isEditMode) {
+            isEditMode = false;
+            const editBtn = document.getElementById('editBtn');
+            const modeIndicator = document.getElementById('modeIndicator');
+            editBtn.innerHTML = '<i class="fa fa-pencil"></i> Edit Data';
+            editBtn.classList.remove('active');
+            modeIndicator.className = 'mode-indicator view-mode';
+            modeIndicator.textContent = '👁️ View Mode';
+            
+            document.querySelectorAll('.editable-select').forEach(sel => {
+                sel.disabled = true;
+                sel.classList.remove('enabled');
+            });
+            
+            document.getElementById('filterType').disabled = false;
+            document.getElementById('filterExpertise').disabled = false;
+            document.getElementById('filterModelA').disabled = false;
+            document.getElementById('filterModelB').disabled = false;
+            document.getElementById('filterModelC').disabled = false;
+        }
+        
+        applyFilters();
+        
+    } catch(error) {
+        statusEl.className = 'save-status show error';
+        statusEl.textContent = '✗ Error: ' + error.message;
+        showToast('Error saving: ' + error.message, 'error');
+    }
+    
+    isSaving = false;
+    saveBtn.disabled = true;
+}
+</script>
+
+</body>
+</html>
